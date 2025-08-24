@@ -2,7 +2,7 @@ import os
 import json
 import datetime
 from typing import Dict, Tuple
-from astrbot.api.star import Context
+from astrbot.api.star import Context, StarTools
 from astrbot.api import logger
 from .utils import CommandUtils
 
@@ -10,10 +10,10 @@ class DataManager:
     def __init__(self, context: Context):
         self.context = context
         
-        # 使用data目录下的数据文件
-        data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
-        os.makedirs(os.path.join(data_dir, "command_to_llm"), exist_ok=True)
-        self.data_file = os.path.join(data_dir, "command_to_llm", "command_mappings.json")
+        # 使用框架提供的 StarTools.get_data_dir() 获取插件专属数据目录
+        # 显式指定插件名称，避免自动检测失败
+        plugin_data_dir = StarTools.get_data_dir("command_to_llm")
+        self.data_file = plugin_data_dir / "command_mappings.json"
         
         # 加载指令映射配置
         self.command_mappings = self.load_command_mappings()

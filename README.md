@@ -121,7 +121,7 @@
 
 ## 配置说明
 
-插件会在 `data/command_to_llm/command_mappings.json` 文件中保存指令映射配置，格式如下：
+插件会在 `data/plugin_data/command_to_llm/command_mappings.json` 文件中保存指令映射配置，格式如下：
 
 ```json
 {
