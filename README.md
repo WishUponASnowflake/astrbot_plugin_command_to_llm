@@ -79,35 +79,12 @@
 示例：
 ```
 /cmd2llm exec rmd--ls
-/cmd2llm exec rmd--add text=喝水 time=10:00
 ```
 
 #### 显示帮助
 ```
 /cmd2llm help
 ```
-
-### LLM函数调用
-
-插件提供了以下LLM函数供AI调用：
-
-#### execute_command
-执行指定的指令
-- `command_text`: 要执行的指令，如 "rmd ls"
-- `args`: 指令参数，可选
-
-#### add_command_mapping
-添加指令映射
-- `command_name`: 指令名称，如 "rmd ls"
-- `llm_function`: 对应的LLM函数名称
-- `description`: 指令描述
-
-#### list_command_mappings
-列出所有指令映射
-
-#### remove_command_mapping
-删除指令映射
-- `command_name`: 要删除的指令名称
 
 ### 动态LLM函数
 

@@ -84,7 +84,6 @@ class CommandToLLM(Star):
         
         格式：/cmd2llm exec <指令名> [参数]
         示例：/cmd2llm exec rmd--ls
-               /cmd2llm exec rmd--add text=喝水 time=10:00
         '''
         # 解析指令名（将 -- 替换为空格）
         command_text = command_str.replace("--", " ")
