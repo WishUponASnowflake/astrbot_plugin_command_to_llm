@@ -13,18 +13,48 @@ class EventFactory:
     def __init__(self, context):
         self.context = context
     
+    def _infer_platform_name_from_id(self, platform_id: str) -> str:
+        """从platform_id推断platform_name（平台类型）"""
+        # 常见的平台ID模式匹配
+        platform_id_lower = platform_id.lower()
+        
+        if "aiocqhttp" in platform_id_lower or "onebot" in platform_id_lower:
+            return "aiocqhttp"
+        elif "qq_official" in platform_id_lower or "qqofficial" in platform_id_lower:
+            return "qq_official"
+        elif "telegram" in platform_id_lower or "tg" in platform_id_lower:
+            return "telegram"
+        elif "discord" in platform_id_lower:
+            return "discord"
+        elif "slack" in platform_id_lower:
+            return "slack"
+        elif "lark" in platform_id_lower:
+            return "lark"
+        elif "wechat" in platform_id_lower:
+            if "padpro" in platform_id_lower:
+                return "wechatpadpro"
+            else:
+                return "webchat"
+        elif "dingtalk" in platform_id_lower:
+            return "dingtalk"
+        else:
+            # 如果无法推断，返回platform_id本身作为fallback
+            # 这样可以保持兼容性
+            logger.warning(f"无法从platform_id '{platform_id}' 推断平台类型，使用原值")
+            return platform_id
+    
     def create_event(self, unified_msg_origin: str, command: str, creator_id: str, creator_name: str = None) -> AstrMessageEvent:
         """创建事件对象，根据平台类型自动选择正确的事件类"""
         
         # 解析平台信息
-        platform_name = "unknown"
+        platform_id = "unknown"  # v4中第一部分是platform_id，不是platform_name
         session_id = "unknown"
         message_type = MessageType.FRIEND_MESSAGE
         
         if ":" in unified_msg_origin:
             parts = unified_msg_origin.split(":")
             if len(parts) >= 3:
-                platform_name = parts[0]
+                platform_id = parts[0]  # v4中这是platform_id
                 msg_type_str = parts[1]
                 session_id = ":".join(parts[2:])  # 可能包含多个冒号
                 
@@ -36,8 +66,10 @@ class EventFactory:
         # 创建基础消息对象
         msg = self._create_message_object(command, session_id, message_type, creator_id, creator_name)
         
-        # 创建平台元数据
-        meta = PlatformMetadata(platform_name, "command_to_llm")
+        # 创建平台元数据 - 在v4中需要正确设置id字段
+        # 尝试从platform_id推断platform_name（类型）
+        platform_name = self._infer_platform_name_from_id(platform_id)
+        meta = PlatformMetadata(platform_name, "command_to_llm", id=platform_id)
         
         # 根据平台类型创建正确的事件对象
         return self._create_platform_specific_event(platform_name, command, msg, meta, session_id)
@@ -295,7 +327,8 @@ class EventFactory:
         )
         
         # 设置必要属性
-        event.unified_msg_origin = f"{meta.name}:{msg.type.value}:{session_id}"
+        # v4中unified_msg_origin的第一部分应该是platform_id，不是platform_name
+        event.unified_msg_origin = f"{meta.id}:{msg.type.value}:{session_id}"
         event.is_wake = True  # 标记为唤醒状态
         event.is_at_or_wake_command = True  # 标记为指令
         
