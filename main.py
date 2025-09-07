@@ -10,7 +10,7 @@ from .dynamic_llm_manager import DynamicLLMManager
 from .event_factory import EventFactory
 from .command_trigger import CommandTrigger
 
-@register("command_to_llm", "kjqwdw", "将指令转换为LLM函数调用", "1.0.0")
+@register("command_to_llm", "kjqwdw", "将指令转换为LLM函数调用", "1.0.1")
 class CommandToLLM(Star):
     def __init__(self, context: Context, config: AstrBotConfig = None):
         super().__init__(context)
